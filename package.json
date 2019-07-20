@@ -1,19 +1,27 @@
 {
-  "name": "project0-1-carrichka",
+  "name": "express-template",
   "version": "1.0.0",
-  "description": "The Expense Reimbursement System (ERS) will manage the process of reimbursing employees for expenses incurred while on company time. All employees in the company can login and submit requests for reimbursement and view their past tickets and pending requests. Finance managers can log in and view all reimbursement requests and past history for all employees in the company. Finance managers are authorized to approve and deny requests for expense reimbursement.",
-  "main": "index.js",
+  "description": "This is a template for a basic express application",
+  "main": "src/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "tslint src/**/*.ts",
+    "lint:fix": "npm run lint -- --fix"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/1906-blake/project0-1-Carrichka.git"
-  },
-  "author": "",
+  "author": "Blake Kruppa",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/1906-blake/project0-1-Carrichka/issues"
-  },
-  "homepage": "https://github.com/1906-blake/project0-1-Carrichka#readme"
+  "dependencies": {
+    "@types/express": "^4.17.0",
+    "@types/express-session": "^1.15.13",
+    "@types/pg": "^7.4.14",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "express-session": "^1.16.2",
+    "nodemon": "^1.19.1",
+    "pg": "^7.11.0",
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3"
+  }
 }

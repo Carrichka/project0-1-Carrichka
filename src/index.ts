@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-//import { usersRouter } from './routers/users.router';
+import { usersRouter } from './routers/users.router';
+import { cardsRouter } from './routers/cards.router';
 import { sessionMiddleware } from './middleware/session.middleware';
 import { authRouter } from './routers/auth.router';
 
@@ -9,7 +10,7 @@ const port = process.env.PORT || 8012;
 const app = express();
 
 /**
- * Logging middleware
+ * Loggin middleware
  * This callback will be invoked anytime a request is made
  * regardless of url or http method
  */
@@ -29,9 +30,9 @@ app.use(sessionMiddleware);
 /*******************************************
  * Register Routers
  ******************************************/
-//app.use('/users', usersRouter);
-//app.use('/cards', cardsRouter);
-//app.use(authRouter);
+app.use('/users', usersRouter);
+app.use('/cards', cardsRouter);
+app.use(authRouter);
 
 app.listen(port, () => {
     console.log('app started on port: ' + port);
