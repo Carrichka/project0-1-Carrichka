@@ -22,39 +22,13 @@ usersRouter.get('', [
  * /users/:id
  * find user by some id
  */
-usersRouter.get('/:id', async (req, res) => {
-    const user = await userDao.findById(+req.params.id);
-    res.json(user);
-});
+usersRouter.get('/:id', [
+    authMiddleware('admin', 'manager'),
+    async (req, res) => {
+        const user = await userDao.findById(+req.params.id);
+        res.json(user);
+    }]);
 
-/**
- * /users/firstName/:firstName
- */
-usersRouter.get('/firstName/:firstName', async (req, res) => {
-    const firstName = req.params.firstName;
-    const users = await userDao.findByFirstName(firstName);
-    res.json(users);
-});
-
-/**
- * /users
- * create new user resource
- */
-usersRouter.post('', async (req, res) => {
-    const user = req.body;
-    if (!user) {
-        res.sendStatus(400);
-    } else {
-        const id = await userDao.save(user);
-        if (!id) {
-            res.sendStatus(400);
-        } else {
-            user.id = id;
-            res.status(201); // created status code
-            res.json(user);
-        }
-    }
-});
 
 /**
  * /users
@@ -71,11 +45,11 @@ usersRouter.patch('', async (req, res) => {
     }
 });
 
-/**
- * /users
- * delete user by id
- */
-usersRouter.delete('/:id', (req, res) => {
-    // userDao.deleteUser(+req.params.id);
-    res.end();
-});
+// /**
+//  * /users
+//  * delete user by id
+//  */
+// usersRouter.delete('/:id', (req, res) => {
+//     // userDao.deleteUser(+req.params.id);
+//     res.end();
+// });

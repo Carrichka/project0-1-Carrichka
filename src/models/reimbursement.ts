@@ -1,15 +1,17 @@
+import User from '../models/user';
+import ReimbursementStatus from './reimbursementStatus';
+import ReimbursementType from './reimbursementType';
 
-
-export default class User {
+export default class Reimbursement {
     constructor(
         public reimbursementId = 0,
-        public author = 0,
+        public author = User,
         public amount = 0,
         public dateSubmitted = 0,
         public dateResolved = 0,
         public description = '',
-        public resolver = 0,
-        public status = 0,
-        public type = 0,
+        public resolver = User,
+        public status = ReimbursementStatus,
+        public type = ReimbursementType
     ) {}
 }

@@ -4,8 +4,11 @@
  */
 export const authMiddleware = (...roles) => (req, res, next) => {
     if (req.session.user) {
-        // console.log('current user = ', req.session.user);
-        if (roles.includes(req.session.user.role)) {
+         console.log('current user = ', req.session.user);
+         const userId = req.body.id;
+         console.log('current userID = ', req.body.id);
+         const currentLoggedInUser = req.session.user;
+        if (roles.includes(req.session.user.role) || (currentLoggedInUser.id === userId)) {
             next();
         } else {
             // 403 means forbidden which means we know who they are
