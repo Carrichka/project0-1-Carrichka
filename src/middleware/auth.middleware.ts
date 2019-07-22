@@ -6,7 +6,7 @@ export const authMiddleware = (...roles) => (req, res, next) => {
     if (req.session.user) {
          console.log('current user = ', req.session.user);
          const userId = req.body.id;
-         console.log('current userID = ', req.body.id);
+         console.log('current userID = ', req.param.id);
          const currentLoggedInUser = req.session.user;
         if (roles.includes(req.session.user.role) || (currentLoggedInUser.id === userId)) {
             next();

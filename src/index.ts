@@ -2,7 +2,6 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { usersRouter } from './routers/users.router';
 import { reimbursementRouter } from './routers/reimbursement.router';
-import { cardsRouter } from './routers/cards.router';
 import { sessionMiddleware } from './middleware/session.middleware';
 import { authRouter } from './routers/auth.router';
 
@@ -32,8 +31,7 @@ app.use(sessionMiddleware);
  * Register Routers
  ******************************************/
 app.use('/users', usersRouter);
-app.use('/reimbursement', reimbursementRouter);
-app.use('/cards', cardsRouter);
+app.use('/reimbursements', reimbursementRouter);
 app.use(authRouter);
 
 app.listen(port, () => {

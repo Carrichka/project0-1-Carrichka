@@ -11,7 +11,7 @@ export const usersRouter = express.Router();
  * find all users
  */
 usersRouter.get('', [
-    authMiddleware('admin', 'manager'),
+    authMiddleware('manager'),
     async (req, res) => {
         const users = await userDao.findAll();
         res.json(users);
@@ -35,9 +35,14 @@ usersRouter.get('/:id', [
  * partially update user resource
  */
 usersRouter.patch('', async (req, res) => {
-    const userId = req.body.id;
-    const currentLoggedInUser = req.session.user;
-    if (currentLoggedInUser && currentLoggedInUser.id === userId) {
+    // const userId = req.body.id;
+    // console.log( 'usersRouter body id = ', req.body.id);
+    // const currentLoggedInUser = req.session.user;
+    // console.log( 'usersRouter session.user = ', req.session.user);
+    // console.log( 'usersRouter currentLoggedInUser = ', currentLoggedInUser);
+    // console.log( 'usersRouter currentLoggedInUser id = ', currentLoggedInUser.id);
+    // if (currentLoggedInUser && currentLoggedInUser.id === userId) {
+        if (authMiddleware('admin')) {
         const updatedUser = await userDao.update(req.body);
         res.json(updatedUser);
     } else {

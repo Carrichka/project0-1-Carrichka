@@ -105,14 +105,14 @@ export async function update(user: User) {
     user = {
         ...oldUser,
         ...user
-    };
-    console.log(user);
+        };
+    console.log('dao update user = ', user);
     let client: PoolClient;
     try {
         client = await connectionPool.connect();
         const queryString = `
-            UPDATE ers_user SET username = $1, password = $2, first_name = $3, last_name = $4, email = $5, role = $7
-            WHERE user_id = $8
+            UPDATE ers_user SET username = $1, password = $2, first_name = $3, last_name = $4, email = $5, role = $6
+            WHERE user_id = $7
             RETURNING *
         `;
         const params = [user.username, user.password, user.firstName, user.lastName, user.email, user.role, user.id];
