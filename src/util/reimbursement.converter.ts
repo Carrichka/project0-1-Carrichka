@@ -4,7 +4,7 @@
 // import ReimbursementType from '../models/reimbursementType';
 import Reimbursement  from '../models/reimbursement';
 
-export function convertSqlUser(row: any) {
+export function convertSqlReimbursement(row: any) {
 
     // const reimbStatus = new ReimbursementStatus(row.statusId, row.status);
     // const reimbType = new ReimbursementType(row.typeId, row.type);

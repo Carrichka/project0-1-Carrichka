@@ -9,7 +9,9 @@ export async function findAll() {
     let client: PoolClient;
     try {
         client = await connectionPool.connect(); // basically .then is everything after this
-        const result = await client.query('SELECT * FROM ers_user');
+        const result = await client.query(`
+        SELECT * FROM ers_user
+        INNER JOIN role USING (role_id)`);
         // convert result from sql object to js object
         return result.rows.map(convertSqlUser);
     } catch (err) {
@@ -26,8 +28,12 @@ export async function findById(id: number) {
     let client: PoolClient;
     try {
         client = await connectionPool.connect();
-        const result = await client.query('SELECT * FROM ers_user WHERE user_id = $1', [id]);
+        const result = await client.query(`
+        SELECT * FROM ers_user
+        INNER JOIN role USING (role_id)
+        WHERE user_id = $1`, [id]);
         const sqlUser = result.rows[0];
+        console.log( 'findById sqlUser = ', sqlUser);
         return sqlUser && convertSqlUser(sqlUser);
     } catch (err) {
         console.log(err);
@@ -37,24 +43,6 @@ export async function findById(id: number) {
     return undefined;
 }
 
-
-// export async function findByFirstName(firstName: string) {
-//     console.log('finding users by first name');
-//     let client: PoolClient;
-//     try {
-//         client = await connectionPool.connect(); // basically .then is everything after this
-//         const result = await client.query('SELECT * FROM app_user WHERE first_name = $1', [firstName]);
-//         return result.rows.map(convertSqlUser);
-//     } catch (err) {
-//         console.log(err);
-//     } finally {
-//         client && client.release();
-//     }
-//     return undefined;
-// }
-
-
-
 export async function findByUsernameAndPassword(username: string, password: string) {
     let client: PoolClient;
     try {
@@ -62,8 +50,9 @@ export async function findByUsernameAndPassword(username: string, password: stri
 
         // prepared statement to secure against SQL injection
         const queryString = `
-            SELECT * FROM ers_user
-                WHERE username = $1 AND password = $2
+        SELECT * FROM ers_user u
+        JOIN role r ON (u.role_id = r.role_id)
+        WHERE username = $1 AND password = $2
         `;
         const result = await client.query(queryString, [username, password]);
         const sqlUser = result.rows[0]; // there should really only be 1 row at best
@@ -75,27 +64,6 @@ export async function findByUsernameAndPassword(username: string, password: stri
     }
     return undefined;
 }
-
-// export async function save(user: User) {
-//     let client: PoolClient;
-//     try {
-//         client = await connectionPool.connect(); // basically .then is everything after this
-//         const queryString = `
-//             INSERT INTO ers_user (username, pass, first_name, last_name, phone, email, role)
-//             VALUES 	($1, $2, $3, $4, $5, $6, $7)
-//             RETURNING user_id
-//         `;
-//         const params = [user.username, user.password, user.firstName, user.lastName, user.email, user.role];
-//         const result = await client.query(queryString, params);
-//         return result.rows[0].user_id;
-//     } catch (err) {
-//         console.log(err);
-//     } finally {
-//         client && client.release();
-//     }
-//     console.log('found all');
-//     return undefined;
-// }
 
 export async function update(user: User) {
     const oldUser = await findById(user.id);
@@ -111,7 +79,7 @@ export async function update(user: User) {
     try {
         client = await connectionPool.connect();
         const queryString = `
-            UPDATE ers_user SET username = $1, password = $2, first_name = $3, last_name = $4, email = $5, role = $6
+            UPDATE ers_user SET username = $1, password = $2, first_name = $3, last_name = $4, email = $5, role_id = $6
             WHERE user_id = $7
             RETURNING *
         `;
