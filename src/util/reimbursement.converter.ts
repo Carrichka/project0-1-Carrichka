@@ -6,7 +6,6 @@ import Reimbursement  from '../models/reimbursement';
 
 export function convertSqlReimbursement(row: any) {
 
-    console.log('convertSqlReimbursement = ', row);
     return new Reimbursement(
         row.reimbursement_id,
         new User(row.user_id, '', '', row.first_name, row.last_name, '', new Role(row.role_id, row.role)),

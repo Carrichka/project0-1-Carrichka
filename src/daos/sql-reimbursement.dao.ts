@@ -20,7 +20,6 @@ export async function findAll() {
             JOIN role l ON (u.role_id = l.role_id)
             JOIN role o ON (e.role_id = o.role_id)`);
         // convert result from sql object to js object
-        console.log('findAll dao result = ', result.rows);
         return result.rows.map(convertSqlReimbursement);
     } catch (err) {
         console.log(err);

@@ -22,8 +22,12 @@ reimbursementRouter.get('', [
  * find reimbursements by status
  */
 reimbursementRouter.get('/status/:statusId', async (req, res) => {
-    const reimbursement = await reimbursementDao.findByStatusId(+req.params.statusId);
-    res.json(reimbursement);
+    if (authMiddleware('Manager')) {
+        const reimbursement = await reimbursementDao.findByStatusId(+req.params.statusId);
+        res.json(reimbursement);
+    } else {
+        res.sendStatus(403);
+    }
 });
 
 /**
@@ -31,9 +35,12 @@ reimbursementRouter.get('/status/:statusId', async (req, res) => {
  * find reimbursements by author
  */
 reimbursementRouter.get('/author/userId/:userId', async (req, res) => {
-    const reimbursement = await reimbursementDao.findByAuthorId(+req.params.userId);
-    console.log('find reimbursements by author req.params.userId = ', req.params.userId);
-    res.json(reimbursement);
+    if (authMiddleware('Manager')) {
+        const reimbursement = await reimbursementDao.findByAuthorId(+req.params.userId);
+        res.json(reimbursement);
+    } else {
+        res.sendStatus(403);
+    }
 });
 
 /**
@@ -58,17 +65,10 @@ reimbursementRouter.post('', async (req, res) => {
 
 /**
  * /Reimbursements
- * partially update user resource
+ * partially update reimbursement resource
  */
 reimbursementRouter.patch('', async (req, res) => {
-    // const userId = req.body.id;
-    // console.log( 'usersRouter body id = ', req.body.id);
-    // const currentLoggedInUser = req.session.user;
-    // console.log( 'usersRouter session.user = ', req.session.user);
-    // console.log( 'usersRouter currentLoggedInUser = ', currentLoggedInUser);
-    // console.log( 'usersRouter currentLoggedInUser id = ', currentLoggedInUser.id);
-    // if (currentLoggedInUser && currentLoggedInUser.id === userId) {
-        if (authMiddleware('admin')) {
+        if (authMiddleware('Manager')) {
         const updatedUser = await reimbursementDao.updateReimbursement(req.body);
         res.json(updatedUser);
     } else {
