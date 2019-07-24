@@ -1,8 +1,7 @@
 import { connectionPool } from '../util/connection.util';
 import { PoolClient } from 'pg';
 import Reimbursement from '../models/reimbursement';
-// import { convertSqlReimb} from '../util/reimbursement.converter';
-// import Reimbursement from '../models/reimbursement';
+import { convertSqlReimbursement } from '../util/reimbursement.converter';
 
 export async function findAll() {
     console.log('finding all reimbursements');
@@ -10,10 +9,19 @@ export async function findAll() {
     try {
         client = await connectionPool.connect();
         const result = await client.query(
-            `SELECT *
-            FROM reimbursement`);
+            `SELECT r.*, u.user_id, u.first_name, u.last_name, u.role_id, e.user_id as resolver_user_id,
+            e.first_name as resolver_first_name, e.last_name as resolver_last_name,
+            e.role_id as resolver_role_id, s.status as status_name, t.type as type_name
+            FROM reimbursement r
+            INNER JOIN ers_user u ON (r.author = u.user_id)
+            JOIN ers_user e ON (r.resolver = e.user_id)
+            JOIN reimbursement_status s ON (r.status = s.status_id)
+            JOIN reimbursement_type t ON (r.type = t.type_id)
+            JOIN role l ON (u.role_id = l.role_id)
+            JOIN role o ON (e.role_id = o.role_id)`);
         // convert result from sql object to js object
-        return result; // .rows.map(convertSqlReimb);
+        console.log('findAll dao result = ', result.rows);
+        return result.rows.map(convertSqlReimbursement);
     } catch (err) {
         console.log(err);
     } finally {
@@ -28,9 +36,19 @@ export async function findByStatusId(id: number) {
     let client: PoolClient;
     try {
         client = await connectionPool.connect();
-        const result = await client.query('SELECT * FROM reimbursement  WHERE status = $1', [id]);
-        // const sqlRmb = result.rows[0];
-        return result /*&& convertSqlUser(sqlUser)*/;
+        const result = await client.query(`
+        SELECT r.*, u.user_id, u.first_name, u.last_name, u.role_id, e.user_id as resolver_user_id,
+        e.first_name as resolver_first_name, e.last_name as resolver_last_name,
+        e.role_id as resolver_role_id, s.status as status_name, t.type as type_name
+        FROM reimbursement r
+        INNER JOIN ers_user u ON (r.author = u.user_id)
+        JOIN ers_user e ON (r.resolver = e.user_id)
+        JOIN reimbursement_status s ON (r.status = s.status_id)
+        JOIN reimbursement_type t ON (r.type = t.type_id)
+        JOIN role l ON (u.role_id = l.role_id)
+        JOIN role o ON (e.role_id = o.role_id)
+        WHERE s.status_id = $1`, [id]);
+        return result && result.rows.map(convertSqlReimbursement);
     } catch (err) {
         console.log(err);
     } finally {
@@ -44,9 +62,19 @@ export async function findByAuthorId(id: number) {
     let client: PoolClient;
     try {
         client = await connectionPool.connect();
-        const result = await client.query('SELECT * FROM reimbursement  WHERE author = $1', [id]);
-        // const sqlRmb = result.rows[0];
-        return result /*&& convertSqlUser(sqlUser)*/;
+        const result = await client.query(`
+        SELECT r.*, u.user_id, u.first_name, u.last_name, u.role_id, e.user_id as resolver_user_id,
+        e.first_name as resolver_first_name, e.last_name as resolver_last_name,
+        e.role_id as resolver_role_id, s.status as status_name, t.type as type_name
+        FROM reimbursement r
+        INNER JOIN ers_user u ON (r.author = u.user_id)
+        JOIN ers_user e ON (r.resolver = e.user_id)
+        JOIN reimbursement_status s ON (r.status = s.status_id)
+        JOIN reimbursement_type t ON (r.type = t.type_id)
+        JOIN role l ON (u.role_id = l.role_id)
+        JOIN role o ON (e.role_id = o.role_id)
+        WHERE u.user_id = $1`, [id]);
+        return result && result.rows.map(convertSqlReimbursement);
     } catch (err) {
         console.log(err);
     } finally {
@@ -81,9 +109,19 @@ export async function findByReimbursementId(id: number) {
     let client: PoolClient;
     try {
         client = await connectionPool.connect();
-        const result = await client.query('SELECT * FROM reimbursement WHERE reimbursement_id = $1', [id]);
-        // const sqlRmb = result.rows[0];
-        return result /*&& convertSqlUser(sqlUser)*/;
+        const result = await client.query(`
+        SELECT r.*, u.user_id, u.first_name, u.last_name, u.role_id, e.user_id as resolver_user_id,
+        e.first_name as resolver_first_name, e.last_name as resolver_last_name,
+        e.role_id as resolver_role_id, s.status as status_name, t.type as type_name
+        FROM reimbursement r
+        INNER JOIN ers_user u ON (r.author = u.user_id)
+        JOIN ers_user e ON (r.resolver = e.user_id)
+        JOIN reimbursement_status s ON (r.status = s.status_id)
+        JOIN reimbursement_type t ON (r.type = t.type_id)
+        JOIN role l ON (u.role_id = l.role_id)
+        JOIN role o ON (e.role_id = o.role_id) WHERE reimbursement_id = $1`, [id]);
+        const sqlRmb = result.rows[0];
+        return convertSqlReimbursement(sqlRmb);
     } catch (err) {
         console.log(err);
     } finally {
@@ -97,10 +135,11 @@ export async function updateReimbursement(rebrsmnt: Reimbursement) {
     if (!oldReimbursement) {
         return undefined;
     }
+    console.log(oldReimbursement);
     rebrsmnt = {
         ...oldReimbursement,
         ...rebrsmnt
-        };
+    };
     console.log('dao update Reimbursement = ', rebrsmnt);
     let client: PoolClient;
     try {
@@ -108,14 +147,12 @@ export async function updateReimbursement(rebrsmnt: Reimbursement) {
         const queryString = `
             UPDATE reimbursement SET author =$1, amount = $2, date_resolved = CURRENT_TIMESTAMP,
             description = $3, resolver = $4, status = $5, type = $6
-            WHERE reimbursement_id= $7
-            RETURNING *;
-        `;
-        const params = [rebrsmnt.author, rebrsmnt.amount, rebrsmnt.description, rebrsmnt.resolver, rebrsmnt.status, rebrsmnt.type, rebrsmnt.reimbursementId];
-        const result = await client.query(queryString, params);
-        const sqlUser = result.rows[0];
-        return(sqlUser);
-       // return convertSqlUser(sqlUser);
+            WHERE reimbursement_id= $7`;
+        const params = [rebrsmnt.author.id, rebrsmnt.amount, rebrsmnt.description, rebrsmnt.resolver.id,
+        rebrsmnt.status.statusId, rebrsmnt.type.typeId, rebrsmnt.reimbursementId];
+        await client.query(queryString, params);
+        return (rebrsmnt);
+        // return convertSqlUser(sqlUser);
     } catch (err) {
         console.log(err);
     } finally {

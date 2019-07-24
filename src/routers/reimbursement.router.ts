@@ -11,9 +11,8 @@ export const reimbursementRouter = express.Router();
  * find all reimbursements
  */
 reimbursementRouter.get('', [
-    // authMiddleware('admin', 'manager'),
+     authMiddleware('Admin', 'Manager'),
     async (req, res) => {
-        console.log('entering reimbursementRouter.get');
         const reimbursement = await reimbursementDao.findAll();
         res.json(reimbursement);
     }]);
@@ -33,6 +32,7 @@ reimbursementRouter.get('/status/:statusId', async (req, res) => {
  */
 reimbursementRouter.get('/author/userId/:userId', async (req, res) => {
     const reimbursement = await reimbursementDao.findByAuthorId(+req.params.userId);
+    console.log('find reimbursements by author req.params.userId = ', req.params.userId);
     res.json(reimbursement);
 });
 
