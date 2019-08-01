@@ -11,7 +11,7 @@ export const reimbursementRouter = express.Router();
  * find all reimbursements
  */
 reimbursementRouter.get('', [
-     authMiddleware('Admin', 'Manager'),
+     // authMiddleware('Admin', 'Manager'),
     async (req, res) => {
         const reimbursement = await reimbursementDao.findAll();
         res.json(reimbursement);
